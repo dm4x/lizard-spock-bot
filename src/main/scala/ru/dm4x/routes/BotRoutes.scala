@@ -10,9 +10,6 @@ import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import ru.dm4x.service.BotService
 
 class BotRoutes(repo: BotService[IO]) {
-  private[dm4x] val httpApp = {
-    readRules
-  }.orNotFound
 
   private def fromOption[T](value: Option[T])(implicit encoder: EntityEncoder[IO, T]) =
     value match {
@@ -41,5 +38,9 @@ class BotRoutes(repo: BotService[IO]) {
       Ok(rules)
 
   }
+
+  private[dm4x] val httpApp = {
+    readRules
+  }.orNotFound
 
 }
