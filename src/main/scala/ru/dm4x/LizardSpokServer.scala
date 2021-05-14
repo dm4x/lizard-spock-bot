@@ -13,7 +13,7 @@ import ru.dm4x.service.BotService
 
 import scala.concurrent.ExecutionContext
 
-object LizardSpokServer extends IOApp {
+object LizardSpockServer extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] =
       pooled[IO].use { tx =>

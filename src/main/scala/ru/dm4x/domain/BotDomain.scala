@@ -23,7 +23,7 @@ object Stone extends Figure {
 }
 object Paper extends Figure {
   override def checkWin(enemy: Figure): Result = enemy match {
-    case Spok => Win
+    case Spock => Win
     case Stone => Win
     case _ => Lose
   }
@@ -38,11 +38,11 @@ object Scissors extends Figure {
 object Lizard extends Figure{
   override def checkWin(enemy: Figure): Result = enemy match {
     case Paper => Win
-    case Spok => Win
+    case Spock => Win
     case _ => Lose
   }
 }
-object Spok extends Figure{
+object Spock extends Figure{
   override def checkWin(enemy: Figure): Result = enemy match {
     case Stone => Win
     case Scissors => Win

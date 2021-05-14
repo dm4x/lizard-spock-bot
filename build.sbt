@@ -1,7 +1,7 @@
 
 scalaVersion := "2.13.4"
 
-name := "lizard-spok-bot"
+name := "lizard-spock-bot"
 organization := "ru.dm4x"
 version := "1.0"
 
