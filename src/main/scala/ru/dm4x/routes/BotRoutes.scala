@@ -1,46 +1,51 @@
 package ru.dm4x.routes
 
-import cats.Applicative
-import cats.effect.IO
-import cats.implicits.toSemigroupKOps
-import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
-import org.http4s.{EntityEncoder, HttpRoutes}
-import org.http4s.dsl.io._
+import cats.effect._
+import cats.syntax.all._
+import org.http4s.HttpRoutes
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
+import ru.dm4x.domain.JsonDto.Rules
+import ru.dm4x.domain.{BotRequest, Player}
 import ru.dm4x.service.BotService
+import ru.dm4x.service.GameService.CurrentGame
+import sttp.tapir._
+import sttp.tapir.json.circe._
+import sttp.tapir.generic.auto._
 
-class BotRoutes(repo: BotService[IO]) {
+import sttp.tapir.server.http4s.Http4sServerInterpreter
 
-  private def fromOption[T](value: Option[T])(implicit encoder: EntityEncoder[IO, T]) =
-    value match {
-      case Some(v) => Ok(v)(IO.ioEffect, encoder)
-      case None    => NotFound()(Applicative[IO])
-    }
+class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
+  implicit val cs: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
+  implicit val t: Timer[IO]         = IO.timer(scala.concurrent.ExecutionContext.global)
 
-  val rules: String =
-    """Ножницы режут бумагу.\r
-      |Бумага заворачивает камень.\r
-      |Камень давит ящерицу.\r
-      |Ящерица травит Спока.\r
-      |Спок ломает ножницы.\r
-      |Ножницы обезглавливают ящерицу.\r
-      |Ящерица съедает бумагу.\r
-      |На бумаге улики против Спока.\r
-      |Спок испаряет камень.\r
-      |И как обычно камень затупляет ножницы.""".stripMargin
+  implicit lazy val rules: Schema[Rules]    = Schema.derived
+  implicit lazy val players: Schema[Player] = Schema.derived
 
-  private val readRules: HttpRoutes[IO] = HttpRoutes.of[IO] {
+  val inputParams: Endpoint[Unit, Unit, Unit, Any] = endpoint.post
+    .description("main endpoint")
+    .in("lizard-bot")
 
-    case req @ POST -> Root / "rules" =>
-      Ok(req.as[String].map(_ => rules))
+  val whoPlaysRoute: Endpoint[BotRequest, Unit, Player, Any] = inputParams.post
+    .description("list of actual players")
+    .in("whoplays")
+    .in(formBody[BotRequest])
+    .out(jsonBody[Player])
 
-    case GET -> Root / "rules" =>
-      Ok(rules)
+  val rulesRoute: Endpoint[BotRequest, Unit, Rules, Any] = inputParams.post
+    .description("rules of the game")
+    .in("rules")
+    .in(formBody[BotRequest])
+    .out(jsonBody[Rules])
 
-  }
+//  val playRoute = ???
+
+  val playersListingRoutes: HttpRoutes[IO] =
+    Http4sServerInterpreter.toRoutes(whoPlaysRoute)(_ => IO(currentGame.getPlayers.asRight[Unit]))
+  val rulesRoutes: HttpRoutes[IO] =
+    Http4sServerInterpreter.toRoutes(rulesRoute)(_ => IO(Rules().asRight[Unit]))
 
   private[dm4x] val httpApp = {
-    readRules
+    playersListingRoutes <+> rulesRoutes
   }.orNotFound
 
 }

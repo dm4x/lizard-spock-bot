@@ -80,7 +80,7 @@ private final class BotStoreImpl[F[_]: Sync](tx: Transactor[F])(implicit ev: Bra
 
   def createPlayer(player: Player): F[Player] = {
     for {
-      id <- Sync[F].delay(UUID.randomUUID())
+      id <- Sync[F].delay(UUID.randomUUID().toString)
       res <-
         sql"INSERT INTO players (id, name, total_score) VALUES ($id, ${player.name}, 0)".update.run
           .transact(tx) *>

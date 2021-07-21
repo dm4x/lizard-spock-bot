@@ -2,7 +2,7 @@ package ru.dm4x.repo
 
 import doobie._
 import doobie.implicits._
-import ru.dm4x.domain.{Game, Figure, Player}
+import ru.dm4x.domain.{Figure, Player}
 
 import java.util.UUID
 

@@ -1,14 +1,14 @@
 package ru.dm4x.domain
 
+import io.circe.generic.JsonCodec
+
 import java.util.UUID
 
 trait Result
 object Win extends Result
 object Lose extends Result
 
-final case class Game(players: List[Player])
-
-final case class Player(id: UUID, name: String, totalScore: Int)
+@JsonCodec final case class Player(id: String = UUID.randomUUID().toString, name: String, totalScore: Int = 0)
 
 trait Figure {
   def checkWin(enemy: Figure): Result

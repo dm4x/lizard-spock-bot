@@ -5,11 +5,10 @@ import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import doobie.util.transactor.Transactor
 import org.http4s._
-import org.http4s.dsl.io._
-import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
 import ru.dm4x.routes.BotRoutes
 import ru.dm4x.service.BotService
+import ru.dm4x.service.GameService.CurrentGame
 
 import scala.concurrent.ExecutionContext
 
@@ -19,7 +18,8 @@ object LizardSpockServer extends IOApp {
       pooled[IO].use { tx =>
         for {
           repo <- BotService.of[IO](tx)
-          booksCrud = new BotRoutes(repo)
+          currentGame = new CurrentGame
+          booksCrud = new BotRoutes(repo, currentGame)
           server <- httpServer(booksCrud.httpApp)
         } yield ExitCode.Success
     }
