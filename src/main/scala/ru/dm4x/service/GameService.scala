@@ -9,7 +9,7 @@ object GameService {
   trait Game {
     def getSize: Int
 
-    def put(p: Player): Unit
+    def put(p: Player): List[Player]
 
     def getCurrentPlayers(): List[Player]
   }
@@ -27,21 +27,20 @@ object GameService {
   }
 
   class CurrentGame extends Game {
-    private val list = List.empty
+    private val list                                   = List.empty
     private val gameRef: AtomicReference[List[Player]] = new AtomicReference(List.empty)
-    override def getSize: Int = gameRef.get().length
-    override def put(p: Player): Unit = gameRef.updateAndGet { playersList =>
-      println(s"Before $playersList")
-      if (!playersList.contains(p)) {
-        playersList ++ List(p)
-      } else playersList
-    }
+    override def getSize: Int                          = gameRef.get().length
+    override def put(p: Player): List[Player] =
+      gameRef.updateAndGet { playersList =>
+        println(s"Before $playersList")
+        if (!playersList.contains(p)) {
+          playersList ++ List(p)
+        } else playersList
+      }
 
-    def getPlayers: Player = CurrentPlayers(list).players.head
+    def getPlayers: Player                 = CurrentPlayers(getCurrentPlayers()).players.head
     def addToList(p: Player): List[Player] = p :: list
 
     override def getCurrentPlayers(): List[Player] = gameRef.get()
   }
 }
-
-
