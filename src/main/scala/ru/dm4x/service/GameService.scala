@@ -38,8 +38,7 @@ object GameService {
         } else playersList
       }
 
-    def getPlayers: Player                 = CurrentPlayers(getCurrentPlayers()).players.head
-    def addToList(p: Player): List[Player] = p :: list
+    def getPlayers: Player = CurrentPlayers(getCurrentPlayers()).players.head
 
     override def getCurrentPlayers(): List[Player] = gameRef.get()
   }

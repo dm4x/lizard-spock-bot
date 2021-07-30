@@ -4,6 +4,7 @@ val doobieVersion = "0.9.0"
 val catsVersion = "2.2.0"
 val catsEffectVersion = "2.2.0"
 val log4CatsVersion = "1.1.1"
+val tapirVersion = "0.18.0-M2"
 
 lazy val root = (project in file("."))
   .settings(
@@ -43,9 +44,9 @@ lazy val root = (project in file("."))
       "io.chrisdavenport" %% "log4cats-slf4j" % log4CatsVersion,
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       //  tapir
-      "com.softwaremill.sttp.tapir" %% "tapir-core" % "0.18.1",
-      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % "0.18.0-M15",
-      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % "0.18.0-M15",
+      "com.softwaremill.sttp.tapir" %% "tapir-core" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
 
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
     ),

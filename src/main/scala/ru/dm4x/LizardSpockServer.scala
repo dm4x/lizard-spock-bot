@@ -19,8 +19,8 @@ object LizardSpockServer extends IOApp {
         for {
           repo <- BotService.of[IO](tx)
           currentGame = new CurrentGame
-          booksCrud = new BotRoutes(repo, currentGame)
-          server <- httpServer(booksCrud.httpApp)
+          botRoutes = new BotRoutes(repo, currentGame)
+          server <- httpServer(botRoutes.httpApp)
         } yield ExitCode.Success
     }
 

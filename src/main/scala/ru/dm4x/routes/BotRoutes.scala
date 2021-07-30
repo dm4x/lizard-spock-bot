@@ -36,11 +36,11 @@ class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
     .in(formBody[BotRequest])
     .out(jsonBody[String])
 
-  val playRoute: Endpoint[BotRequest, Unit, CurrentPlayers, Any] = inputParams.post
+  val playRoute: Endpoint[BotRequest, Unit, String, Any] = inputParams.post
     .description("add new player")
     .in("play")
     .in(formBody[BotRequest])
-    .out(jsonBody[CurrentPlayers])
+    .out(jsonBody[String])
 
   val playersListingRoutes: HttpRoutes[IO] =
     Http4sServerInterpreter.toRoutes(whoPlaysRoute)(_ => IO(currentGame.getPlayers.asRight[Unit]))
@@ -48,7 +48,7 @@ class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
     Http4sServerInterpreter.toRoutes(rulesRoute)(_ => IO(Rules().pretty.asRight[Unit]))
   val playRoutes: HttpRoutes[IO] =
     Http4sServerInterpreter.toRoutes(playRoute)(request =>
-      IO(CurrentPlayers(currentGame.put(Player(name = request.user_name))).asRight[Unit]))
+      IO(CurrentPlayers(currentGame.put(Player(name = request.user_name))).toString.asRight[Unit]))
 
   private[dm4x] val httpApp = {
     playersListingRoutes <+> rulesRoutes <+> playRoutes
