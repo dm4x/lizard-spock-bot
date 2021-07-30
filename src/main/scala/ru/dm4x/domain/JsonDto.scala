@@ -20,8 +20,6 @@ object JsonDto {
 
   @JsonCodec final case class Joke(pretty: String = "\"I'm not crazy. My mother had me tested.\"")
 
-  @JsonCodec final case class CurrentPlayers(players: Seq[Player])
-
   implicit lazy val encoder: Encoder[Player] = deriveEncoder[Player]
   implicit lazy val decoder: Decoder[Player] = deriveDecoder[Player]
 

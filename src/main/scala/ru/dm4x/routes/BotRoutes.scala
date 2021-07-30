@@ -4,7 +4,7 @@ import cats.effect._
 import cats.syntax.all._
 import org.http4s.HttpRoutes
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
-import ru.dm4x.domain.JsonDto.{CurrentPlayers, Rules}
+import ru.dm4x.domain.JsonDto.Rules
 import ru.dm4x.domain.{BotRequest, Player}
 import ru.dm4x.service.BotService
 import ru.dm4x.service.GameService.CurrentGame
@@ -24,11 +24,11 @@ class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
     .description("main endpoint")
     .in("lizard-bot")
 
-  val whoPlaysRoute: Endpoint[BotRequest, Unit, Player, Any] = inputParams.post
+  val whoPlaysRoute: Endpoint[BotRequest, Unit, List[Player], Any] = inputParams.post
     .description("list of actual players")
     .in("whoplays")
     .in(formBody[BotRequest])
-    .out(jsonBody[Player])
+    .out(jsonBody[List[Player]])
 
   val rulesRoute: Endpoint[BotRequest, Unit, String, Any] = inputParams.post
     .description("rules of the game")
@@ -43,12 +43,12 @@ class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
     .out(jsonBody[String])
 
   val playersListingRoutes: HttpRoutes[IO] =
-    Http4sServerInterpreter.toRoutes(whoPlaysRoute)(_ => IO(currentGame.getPlayers.asRight[Unit]))
+    Http4sServerInterpreter.toRoutes(whoPlaysRoute)(_ => IO(currentGame.getCurrentPlayers().asRight[Unit]))
   val rulesRoutes: HttpRoutes[IO] =
     Http4sServerInterpreter.toRoutes(rulesRoute)(_ => IO(Rules().pretty.asRight[Unit]))
   val playRoutes: HttpRoutes[IO] =
     Http4sServerInterpreter.toRoutes(playRoute)(request =>
-      IO(CurrentPlayers(currentGame.put(Player(name = request.user_name))).toString.asRight[Unit]))
+      IO(currentGame.put(Player(name = request.user_name)).toString.asRight[Unit]))
 
   private[dm4x] val httpApp = {
     playersListingRoutes <+> rulesRoutes <+> playRoutes

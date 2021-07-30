@@ -1,6 +1,5 @@
 package ru.dm4x.service
 
-import ru.dm4x.domain.JsonDto.CurrentPlayers
 import ru.dm4x.domain.Player
 
 import java.util.concurrent.atomic.AtomicReference
@@ -38,8 +37,6 @@ object GameService {
         } else playersList
       }
 
-    def getPlayers: Player = CurrentPlayers(getCurrentPlayers()).players.head
-
-    override def getCurrentPlayers(): List[Player] = gameRef.get()
+    override def getCurrentPlayers(): List[Player] = gameRef.getPlain
   }
 }
