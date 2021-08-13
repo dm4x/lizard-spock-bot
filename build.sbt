@@ -1,4 +1,4 @@
-val http4sVersion = "0.21.22"
+val http4sVersion = "0.21.25"
 val circeVersion = "0.13.0"
 val doobieVersion = "0.9.0"
 val catsVersion = "2.2.0"
@@ -28,7 +28,8 @@ lazy val root = (project in file("."))
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
       "org.http4s" %% "http4s-blaze-client" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
-      "org.http4s" %% "http4s-jdk-http-client" % "0.3.6",
+//      "org.http4s" %% "http4s-jdk-http-client" % "0.3.6",
+      "org.http4s" %% "http4s-client" % http4sVersion,
       //  circe
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
@@ -64,7 +65,7 @@ lazy val root = (project in file("."))
         expose(8090)
       }
     },
-  ).enablePlugins(JavaAppPackaging)
+  ).enablePlugins(JavaAppPackaging, sbtdocker.DockerPlugin)
 
 run / fork := true
 run / connectInput := true
