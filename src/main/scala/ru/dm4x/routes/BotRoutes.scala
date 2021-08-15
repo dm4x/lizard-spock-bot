@@ -4,14 +4,14 @@ import cats.effect._
 import cats.syntax.all._
 import org.http4s.client.dsl.io._
 import org.http4s.client.blaze.BlazeClientBuilder
-import org.http4s.{EntityDecoder, HttpRoutes, Method, Request, Uri}
-import org.http4s.implicits.{http4sKleisliResponseSyntaxOptionT, http4sLiteralsSyntax}
+import org.http4s.{HttpRoutes, Method, Uri}
+import org.http4s.implicits.{http4sKleisliResponseSyntaxOptionT}
 import ru.dm4x.domain.{BotRequest, JsonDto, Player}
-import ru.dm4x.service.{BotService, GameService}
+import ru.dm4x.service.BotService
 import ru.dm4x.service.GameService.CurrentGame
 import sttp.tapir._
 import sttp.tapir.json.circe._
-import sttp.tapir.generic.auto._
+import sttp.tapir.generic.auto._ // cannot be deleted
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
@@ -33,7 +33,7 @@ class BotRoutes(repo: BotService[IO], currentGame: CurrentGame) {
   val rulesRoute: Endpoint[BotRequest, Unit, String, Any] = inputParams.post
     .description("rules of the game")
     .in("rules")
-    .in(formBody[BotRequest])
+    .in(formBody[BotRequest]) // codec will be created at compile time
     .out(jsonBody[String])
 
   val playRoute: Endpoint[BotRequest, Unit, List[Player], Any] = inputParams.post
