@@ -11,7 +11,8 @@ import ru.dm4x.domain.Player
 import java.util.UUID
 import java.time.{LocalDate, Year}
 
-private final class BotStoreImpl[F[_]: Sync](tx: Transactor[F])(implicit ev: Bracket[F, Throwable]) extends BotService[F] {
+private final class BotStoreImpl[F[_]: Sync](tx: Transactor[F])(implicit ev: Bracket[F, Throwable])
+    extends BotService[F] {
   private implicit val uuidMeta: Meta[UUID] = Meta[String].timap(UUID.fromString)(_.toString)
   private implicit val yearMeta: Meta[Year] = Meta[Int].timap(Year.of)(_.getValue)
   private implicit val localDateMeta: Meta[LocalDate] =
@@ -78,14 +79,12 @@ private final class BotStoreImpl[F[_]: Sync](tx: Transactor[F])(implicit ev: Bra
   override def getAllPlayers: F[List[Player]] =
     players.query[Player].to[List].transact(tx)
 
-  def createPlayer(player: Player): F[Player] = {
+  def createPlayer(player: Player): F[Player] =
     for {
       id <- Sync[F].delay(UUID.randomUUID().toString)
-      res <-
-        sql"INSERT INTO players (id, name, total_score) VALUES ($id, ${player.name}, 0)".update.run
-          .transact(tx) *>
-          Sync[F].pure(Player(id, player.name, player.totalScore))
+      res <- sql"INSERT INTO players (id, name, total_score) VALUES ($id, ${player.name}, 0)".update.run
+        .transact(tx) *>
+        Sync[F].pure(Player(id, player.name, "", player.totalScore))
 
     } yield res
-  }
 }

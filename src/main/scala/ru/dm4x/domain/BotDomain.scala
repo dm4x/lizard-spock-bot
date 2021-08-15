@@ -5,10 +5,13 @@ import io.circe.generic.JsonCodec
 import java.util.UUID
 
 trait Result
-object Win extends Result
+object Win  extends Result
 object Lose extends Result
 
-@JsonCodec final case class Player(id: String = UUID.randomUUID().toString, name: String, totalScore: Int = 0)
+@JsonCodec final case class Player(id: String = UUID.randomUUID().toString,
+                                   name: String,
+                                   currentChoice: String = "",
+                                   totalScore: Int = 0)
 
 trait Figure {
   def checkWin(enemy: Figure): Result
@@ -17,35 +20,35 @@ trait Figure {
 object Stone extends Figure {
   override def checkWin(enemy: Figure): Result = enemy match {
     case Scissors => Win
-    case Lizard => Win
-    case _ => Lose
+    case Lizard   => Win
+    case _        => Lose
   }
 }
 object Paper extends Figure {
   override def checkWin(enemy: Figure): Result = enemy match {
     case Spock => Win
     case Stone => Win
-    case _ => Lose
+    case _     => Lose
   }
 }
 object Scissors extends Figure {
   override def checkWin(enemy: Figure): Result = enemy match {
-    case Paper => Win
+    case Paper  => Win
     case Lizard => Win
-    case _ => Lose
+    case _      => Lose
   }
 }
-object Lizard extends Figure{
+object Lizard extends Figure {
   override def checkWin(enemy: Figure): Result = enemy match {
     case Paper => Win
     case Spock => Win
-    case _ => Lose
+    case _     => Lose
   }
 }
-object Spock extends Figure{
+object Spock extends Figure {
   override def checkWin(enemy: Figure): Result = enemy match {
-    case Stone => Win
+    case Stone    => Win
     case Scissors => Win
-    case _ => Lose
+    case _        => Lose
   }
 }

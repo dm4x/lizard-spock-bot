@@ -11,17 +11,14 @@ object GameService {
     def put(p: Player): List[Player]
 
     def getCurrentPlayers(): List[Player]
+
+    def modifsyPlayer(id: String): List[Player]
   }
 
   def run(game: Game): Unit = {
     def myRunnable(name: String): Runnable = new Runnable {
-      override def run(): Unit = {
-        println(s"| Thread ${Thread.currentThread().getName}| game size now: ${game.getSize}")
-        println(s"| Thread ${Thread.currentThread().getName}| trying to add a player $name")
+      override def run(): Unit =
         game.put(Player(name = name))
-        println(s"| Thread ${Thread.currentThread().getName}| game size now: ${game.getSize}")
-        println(s"| Thread ${Thread.currentThread().getName}| current players: ${game.getCurrentPlayers()}")
-      }
     }
   }
 
@@ -29,6 +26,7 @@ object GameService {
     private val list                                   = List.empty
     private val gameRef: AtomicReference[List[Player]] = new AtomicReference(List.empty)
     override def getSize: Int                          = gameRef.get().length
+
     override def put(p: Player): List[Player] =
       gameRef.updateAndGet { playersList =>
         println(s"Before $playersList")
@@ -37,6 +35,11 @@ object GameService {
         } else playersList
       }
 
+    override def modifsyPlayer(id: String): List[Player] = gameRef.getAcquire
+
     override def getCurrentPlayers(): List[Player] = gameRef.getPlain
+
+    def allHaveChoice: Boolean = gameRef.getPlain.exists(_.currentChoice == "")
   }
+
 }
